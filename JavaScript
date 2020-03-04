@@ -1,0 +1,69 @@
+const BACK_URL =
+    'https://gist.githubusercontent.com/bar0191/fae6084225b608f25e98b733864a102b/raw/dea83ea9cf4a8a6022bfc89a8ae8df5ab05b6dcc/pokemon.json';
+
+let papa;
+let buscador;
+let listaPokemon = []; // SOLO SE CAMBIA UNA VEZ
+
+const buscarPokemon = () => {
+    const filtrador = buscador.value;
+
+    const pokemonTotal = listaPokemon.filter((pokemon) => {
+        const pokemonConcuerdaNombre = pokemon.Name.toLowerCase().includes(
+            filtrador.toLowerCase()
+        );
+
+        // Validacion Tipo
+        const tiposFiltrados = pokemon.Types.filter((tipo) => {
+            return tipo.toLowerCase().includes(filtrador.toLowerCase());
+        });
+        const pokemonFiltradosTipo = tiposFiltrados.length > 0;
+
+        return pokemonConcuerdaNombre || pokemonFiltradosTipo;
+    });
+
+    // console.log(pokemonTotal);
+
+    mostrarPokemon(pokemonTotal);
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+    papa = document.querySelector('.suggestions');
+    buscador = document.querySelector('.input');
+
+    buscador.addEventListener('keyup', buscarPokemon);
+});
+
+const mostrarPokemon = (pokemonLlegan) => {
+    const htmlPokemon = pokemonLlegan.map((pokemon) => {
+        return `
+        <li>
+            <img
+                src="${pokemon.img}"
+                alt=""
+            />
+            <div class="info">
+                <h1>${pokemon.Name}</h1>
+                ${pokemon.Types.map((element) => {
+                    return `
+                        <span class="type ${element.toLowerCase()}">${element}</span>
+                    `;
+                }).join('')}
+            </div>
+        </li>
+    `;
+    });
+
+    papa.innerHTML = htmlPokemon.join('<br>');
+};
+
+fetch(BACK_URL)
+    .then((res) => {
+        return res.json();
+    })
+    .then((data) => {
+        listaPokemon = data;
+        mostrarPokemon(listaPokemon);
+    });
+
+//bit.ly/debakatasWA
